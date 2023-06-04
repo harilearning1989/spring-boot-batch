@@ -40,7 +40,6 @@ public class EmployeeReader extends FlatFileItemReader<EmployeeDTO> implements S
     public void beforeStep(StepExecution stepExecution) {
         JobParameters jobParameters = stepExecution.getJobParameters();
         String filePath = jobParameters.getString("filePath");
-        LOGGER.info("filePath = [{}].", filePath);
 
         FileSystemResource resource = new FileSystemResource(filePath);
         setResource(resource);

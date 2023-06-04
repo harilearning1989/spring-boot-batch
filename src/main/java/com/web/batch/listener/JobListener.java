@@ -1,4 +1,4 @@
-package com.web.batch.listener.emp;
+package com.web.batch.listener;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,8 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class EmployeeJobListener implements JobExecutionListener {
-    private static final Logger LOG = LoggerFactory.getLogger(EmployeeJobListener.class);
+public class JobListener implements JobExecutionListener {
+    private static final Logger LOG = LoggerFactory.getLogger(JobListener.class);
 
     private JobExecution activeJob;
 
@@ -25,11 +25,11 @@ public class EmployeeJobListener implements JobExecutionListener {
         final String jobName = jobExecution.getJobInstance().getJobName();
         final BatchStatus batchStatus = jobExecution.getStatus();
 
-        LOG.info("EmployeeJobListener beforeJob with job {} and status {}", jobName,batchStatus.isRunning());
+        LOG.info("JobListener beforeJob with job {} and status {}", jobName,batchStatus.isRunning());
 
         synchronized (jobExecution) {
             if (activeJob != null && activeJob.isRunning()) {
-                LOG.info("EmployeeJobListener beforeJob isRunning with job {} and status {}", jobName,batchStatus.isRunning());
+                LOG.info("JobListener beforeJob isRunning with job {} and status {}", jobName,batchStatus.isRunning());
                 try {
                     jobOperator.stop(jobExecution.getId());
                 } catch (NoSuchJobExecutionException | JobExecutionNotRunningException e) {
@@ -45,7 +45,7 @@ public class EmployeeJobListener implements JobExecutionListener {
     public void afterJob(JobExecution jobExecution) {
         final String jobName = jobExecution.getJobInstance().getJobName();
         final BatchStatus jobExecutionStatus = jobExecution.getStatus();
-        LOG.info("EmployeeJobListener afterJob afterJob with job {} and status {}", jobName,jobExecutionStatus.isRunning());
+        LOG.info("JobListener afterJob afterJob with job {} and status {}", jobName,jobExecutionStatus.isRunning());
 
         synchronized (jobExecution) {
             if (jobExecution == activeJob) {

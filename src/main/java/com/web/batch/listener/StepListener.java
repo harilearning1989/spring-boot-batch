@@ -1,4 +1,4 @@
-package com.web.batch.listener.emp;
+package com.web.batch.listener;
 
 
 import org.slf4j.Logger;
@@ -9,18 +9,18 @@ import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.stereotype.Component;
 
 @Component
-public class EmployeeStepListener implements StepExecutionListener {
-    private static final Logger LOG = LoggerFactory.getLogger(EmployeeStepListener.class);
+public class StepListener implements StepExecutionListener {
+    private static final Logger LOG = LoggerFactory.getLogger(StepListener.class);
 
     @Override
     public void beforeStep(StepExecution stepExecution) {
-        LOG.info("EmployeeStepListener beforeStep with Step {} and completed for job {}",
+        LOG.info("StepListener beforeStep with Step {} and completed for job {}",
                 stepExecution.getStepName(),stepExecution.getJobExecution().getJobInstance().getJobName());
     }
 
     @Override
     public ExitStatus afterStep(StepExecution stepExecution) {
-        LOG.info("EmployeeStepListener afterStep with Step {} and completed for job {}",
+        LOG.info("StepListener afterStep with Step {} and completed for job {}",
                 stepExecution.getStepName(),stepExecution.getJobExecution().getJobInstance().getJobName());
         return null;
     }

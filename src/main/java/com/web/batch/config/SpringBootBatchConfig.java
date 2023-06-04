@@ -2,12 +2,11 @@ package com.web.batch.config;
 
 import com.web.batch.constants.JobConstants;
 import com.web.batch.dtos.EmployeeDTO;
-import com.web.batch.listener.emp.EmployeeJobListener;
-import com.web.batch.listener.emp.EmployeeReadListener;
-import com.web.batch.listener.emp.EmployeeStepListener;
-import com.web.batch.listener.emp.EmployeeWriteListener;
+import com.web.batch.listener.JobListener;
+import com.web.batch.listener.ReadListener;
+import com.web.batch.listener.StepListener;
+import com.web.batch.listener.WriteListener;
 import com.web.batch.models.Employee;
-import com.web.batch.step.employee.EmployeeReader;
 import com.web.batch.step.str.StringProcessor;
 import com.web.batch.step.str.StringReader;
 import com.web.batch.step.str.StringWriter;
@@ -45,6 +44,7 @@ public class SpringBootBatchConfig {
 
     @Resource(name=JobConstants.FIRST_JOB_EXECUTION_LISTENER_ID)
     protected JobExecutionListener listener;
+    
     /**
      * Step consist of an ItemReader, ItemProcessor and an ItemWriter.
      *
@@ -71,6 +71,10 @@ public class SpringBootBatchConfig {
         return new JobBuilder("employeeJob", jobRepository)
                 .incrementer(new RunIdIncrementer())
                 .listener(listener)
+                .listener(new StepListener())
+                .listener(new JobListener())
+                .listener(new ReadListener<>())
+                .listener(new WriteListener<>())
                 .flow(employeeStep(jobRepository, platformTransactionManager))
                 .end()
                 .build();
@@ -214,22 +218,22 @@ public class SpringBootBatchConfig {
 
     @Bean
     public ItemReadListener<Employee> employeeReadListener() {
-        return new EmployeeReadListener<>();
+        return new ReadListener<>();
     }
 
     @Bean
     public StepExecutionListener employeeStepListener() {
-        return new EmployeeStepListener();
+        return new StepListener();
     }
 
     @Bean
     public ItemWriteListener<Employee> employeeWriteListener() {
-        return new EmployeeWriteListener<>();
+        return new WriteListener<>();
     }
 
     @Bean
     public JobExecutionListener employeeJobListener() {
-        return new EmployeeJobListener();
+        return new JobListener();
     }
 
     @Bean
