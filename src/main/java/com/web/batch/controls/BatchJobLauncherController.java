@@ -23,6 +23,9 @@ public class BatchJobLauncherController {
     @Qualifier("employeeJob")
     @Autowired
     Job employeeJob;
+    @Qualifier("studentJob")
+    @Autowired
+    Job studentJob;
     @Qualifier("simpleJob")
     @Autowired
     Job simpleJob;
@@ -35,6 +38,8 @@ public class BatchJobLauncherController {
     @Qualifier("job3")
     @Autowired
     Job job3;
+
+
 
     /**
      * Method to launch the job
@@ -58,6 +63,30 @@ public class BatchJobLauncherController {
 
         return "Job Launched Successfully!";
     }
+
+    /**
+     * Method to launch the job
+     *
+     * @return String
+     * @throws Exception
+     */
+    @RequestMapping("/student")
+    public String readStudent() throws Exception {
+        String fileLocation = DownloadGitHubFiles.downloadFile("csv/StudentInfo.csv");
+        try {
+            JobParameters jobParameters = new JobParametersBuilder()
+                    .addLong("time", System.currentTimeMillis())
+                    .addString("filePath", fileLocation)
+                    .toJobParameters();
+            //job launcher is an interface for running the jobs
+            jobLauncher.run(studentJob, jobParameters);
+        } catch (Exception e) {
+            logger.info(e.getMessage());
+        }
+
+        return "Job Launched Successfully!";
+    }
+
     /**
      * Method to launch the job
      *

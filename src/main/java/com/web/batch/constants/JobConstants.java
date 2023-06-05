@@ -8,5 +8,8 @@ public final class JobConstants {
     public static final String FIRST_JOB_ITEM_PROCESSOR_ID = "firstItemProcessor";
     public static final String FIRST_JOB_ITEM_WRITER_ID = "firstItemWriter";
     public static final String FIRST_JOB_EXECUTION_LISTENER_ID = "firstJobExecutionListener";
+    public static final String STUDENT_JOB_ITEM_READER_ID = "studentItemReader";
+    public static final String STUDENT_JOB_ITEM_PROCESSOR_ID = "studentItemProcessor";
+    public static final String STUDENT_JOB_ITEM_WRITER_ID = "studentItemWriter";
 
 }

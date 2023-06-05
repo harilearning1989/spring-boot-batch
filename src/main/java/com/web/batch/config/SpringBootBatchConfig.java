@@ -2,16 +2,18 @@ package com.web.batch.config;
 
 import com.web.batch.constants.JobConstants;
 import com.web.batch.dtos.EmployeeDTO;
-import com.web.batch.listener.JobListener;
-import com.web.batch.listener.ReadListener;
+import com.web.batch.dtos.StudentDTO;
+import com.web.batch.listener.*;
+import com.web.batch.listener.ChunkListener;
 import com.web.batch.listener.StepListener;
-import com.web.batch.listener.WriteListener;
 import com.web.batch.models.Employee;
+import com.web.batch.models.Student;
 import com.web.batch.step.str.StringProcessor;
 import com.web.batch.step.str.StringReader;
 import com.web.batch.step.str.StringWriter;
 import jakarta.annotation.Resource;
 import org.springframework.batch.core.*;
+import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.repository.JobRepository;
@@ -42,8 +44,30 @@ public class SpringBootBatchConfig {
     @Resource(name=JobConstants.FIRST_JOB_ITEM_WRITER_ID)
     protected ItemWriter<Employee> writer;
 
+
+    @Resource(name= JobConstants.STUDENT_JOB_ITEM_READER_ID)
+    protected ItemReader<StudentDTO> studentReader;
+    @Resource(name=JobConstants.STUDENT_JOB_ITEM_PROCESSOR_ID)
+    protected ItemProcessor<StudentDTO, Student> studentProcessor;
+
+    @Resource(name=JobConstants.STUDENT_JOB_ITEM_WRITER_ID)
+    protected ItemWriter<Student> studentWriter;
+
     @Resource(name=JobConstants.FIRST_JOB_EXECUTION_LISTENER_ID)
     protected JobExecutionListener listener;
+
+    @Resource
+    protected JobListener jobListener;
+    @Resource
+    protected StepListener stepListener;
+    @Resource
+    protected ReadListener readListener;
+    @Resource
+    protected WriteListener writeListener;
+    @Resource
+    protected ProcessListener processListener;
+    @Resource
+    protected ChunkListener chunkListener;
     
     /**
      * Step consist of an ItemReader, ItemProcessor and an ItemWriter.
@@ -71,11 +95,43 @@ public class SpringBootBatchConfig {
         return new JobBuilder("employeeJob", jobRepository)
                 .incrementer(new RunIdIncrementer())
                 .listener(listener)
-                .listener(new StepListener())
-                .listener(new JobListener())
-                .listener(new ReadListener<>())
-                .listener(new WriteListener<>())
+                .listener(stepListener)
+                .listener(jobListener)
+                .listener(readListener)
+                .listener(writeListener)
+                .listener(processListener)
+                .listener(chunkListener)
                 .flow(employeeStep(jobRepository, platformTransactionManager))
+                .end()
+                .build();
+    }
+
+    /**
+     * Step consist of an ItemReader, ItemProcessor and an ItemWriter.
+     *
+     * @return step
+     */
+    @Bean
+    public Step studentStep(JobRepository jobRepository, PlatformTransactionManager platformTransactionManager) {
+        return new StepBuilder("studentStep", jobRepository)
+                .<StudentDTO, Student>chunk(1, platformTransactionManager)
+                .reader(studentReader)
+                .processor(studentProcessor)
+                .writer(studentWriter)
+                .build();
+    }
+
+    /**
+     * A Job is made up of many steps and each step is
+     * a READ-PROCESS-WRITE task or a single operation task (tasklet).
+     *
+     * @return job
+     */
+    @Bean
+    public Job studentJob(JobRepository jobRepository, PlatformTransactionManager platformTransactionManager) {
+        return new JobBuilder("studentJob", jobRepository)
+                .incrementer(new RunIdIncrementer())
+                .flow(studentStep(jobRepository, platformTransactionManager))
                 .end()
                 .build();
     }
